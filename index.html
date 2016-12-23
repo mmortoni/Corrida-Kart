@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Corrida de Kart</title>
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="stylesheet" href="css/bootstrap-theme.css">
+
+</head>
+<body class="container">
+
+    <h1 class="text-center">Corrida de Kart</h1>
+
+    <div id="mensagemView"></div>
+
+    <form class="form">
+        <div class="form-group">
+            <label for="data">Tomada de Tempo</label>
+            <p class="form-control-static">Corrida: <span class="label label-default" id="corrida">1</span></p>
+        </div>
+
+        <div class="text-center">
+            <button class="btn btn-primary text-center" type="button" id="iniciarTomadaDeTempo">
+                Iniciar
+            </button>
+        </div> 
+
+    </form>
+
+    <div id="tomadaDeTempoView"></div>
+
+    <div class="row hidden">
+        <button class="btn btn-primary" type="submit" id="iniciarLargada">Largada</button>
+    </div>
+
+    <div id="corridaView"></div>
+
+    <script src="js/app/lib/systemjs/dist/system.js"></script>
+    <script>
+        System.defaultJSExtensions = true; // permite omitir a extensão .js dos imports
+        System.import('js/app/boot').catch(function(err){ 
+            console.error(err);
+        });
+
+        function esconderDivRow(){
+          [].forEach.call(document.querySelectorAll('div.row'), function (el) {
+               el.classList.add("hidden");
+            });            
+        }
+    </script>    
+</body>
+</html>
