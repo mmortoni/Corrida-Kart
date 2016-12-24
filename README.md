@@ -2,11 +2,11 @@
 
 ##Dependências
 - **Node.js**  
-Voc� deve fazer o download e instal�-lo [aqui](https://nodejs.org/en/).  
+Você deve fazer o download e instalá-lo [aqui](https://nodejs.org/en/).  
 
-- **http-server**
+- **http-server**  
 Instalando globalmente:
-Instala��o via NPM:
+Instalação via NPM:
 
  npm install http-server -g
 
