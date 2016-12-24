@@ -1,16 +1,15 @@
 # Corrida-Kart
 
-##Dependencies
+##DependÃªncias
 - **Node.js**  
-Você deve fazer o download e instalá-lo [here](https://nodejs.org/en/).  
+Vocï¿½ deve fazer o download e instalï¿½-lo [aqui](https://nodejs.org/en/).  
 
 - **http-server**
 Instalando globalmente:
-Instalação via NPM:
+Instalaï¿½ï¿½o via NPM:
 
  npm install http-server -g
- 
+
  ##Executando
 
  Clique em server.bat
- 
