@@ -81,13 +81,69 @@ System.register(['./View', '../helpers/DateHelper', '../controllers/CorridaContr
                     key: 'template',
                     value: function template(model) {
                         var voltas = [],
-                            max = { piloto: { nome: '' }, tempo: '' };
+                            dl = [{ nome: '', hora: '' }],
+                            mvc = { piloto: { nome: '' }, tempo: '' },
+                            vencedor = { piloto: { nome: '' }, hora: '' },
+                            codigo = '',
+                            tmvp = [],
+                            horaChegadaVencedor = void 0,
+                            horaChegadaPiloto = void 0,
+                            tempoDiferenca = void 0,
+                            diff = void 0;
 
                         if (model.corridas[0]) {
                             voltas = model.corridas[0].voltas;
 
-                            max = voltas.reduce(function (prev, current) {
+                            vencedor = voltas.filter(function (voltaPiloto) {
+                                return voltaPiloto.numero == '4';
+                            }).reduce(function (prev, current) {
+                                return Number(prev.hora.replace(/:/g, '')) < Number(current.hora.replace(/:/g, '')) && prev.numero == '4' ? prev : current;
+                            });
+
+                            mvc = voltas.reduce(function (prev, current) {
                                 return Number(prev.velocidadeMedia.replace(',', '.')) > Number(current.velocidadeMedia.replace(',', '.')) ? prev : current;
+                            });
+
+                            voltas.forEach(function (volta) {
+                                if (volta.piloto.codigo != codigo) {
+                                    codigo = volta.piloto.codigo;
+                                    var voltasPiloto = voltas.filter(function (voltaPiloto) {
+                                        return voltaPiloto.piloto.codigo == codigo;
+                                    });
+
+                                    tmvp.push(voltasPiloto.reduce(function (prev, current) {
+                                        return Number(prev.velocidadeMedia.replace(',', '.')) > Number(current.velocidadeMedia.replace(',', '.')) ? prev : current;
+                                    }));
+                                }
+                            });
+
+                            horaChegadaVencedor = new Date('01/01/1970 ' + vencedor.hora);
+                            diff = new Date('01/01/1970 ');
+
+                            dl = [];
+                            voltas.filter(function (volta) {
+                                return volta.numero == '4';
+                            }).map(function (v) {
+                                if (v.piloto.codigo != vencedor.piloto.codigo) {
+                                    horaChegadaPiloto = new Date('01/01/1970 ' + v.hora);
+                                    diff.setTime(horaChegadaPiloto.getTime() - horaChegadaVencedor.getTime());
+
+                                    tempoDiferenca = '';
+
+                                    if (diff.getMinutes() > 0) tempoDiferenca = diff.getMinutes(); //(Array(2).join("0") + diff.getMinutes()).slice(-2);
+
+                                    if (diff.getSeconds() > 0) {
+                                        if (tempoDiferenca) {
+                                            tempoDiferenca += ':' + (Array(2).join("0") + diff.getSeconds()).slice(-2);
+                                        } else {
+                                            tempoDiferenca = (Array(2).join("0") + diff.getSeconds()).slice(-2);
+                                        }
+                                    }
+
+                                    tempoDiferenca += '.' + (Array(3).join("0") + diff.getMilliseconds()).slice(-3);
+
+                                    dl.push({ nome: v.piloto.nome, hora: tempoDiferenca });
+                                }
                             });
                         }
 
@@ -95,7 +151,11 @@ System.register(['./View', '../helpers/DateHelper', '../controllers/CorridaContr
                             return '\n                    ' + n.horaLargada + '\n                ';
                         }) + ' \n            </h2>\n        </div>\n\n        <table class="table table-hover table-bordered">\n\n            <thead>\n                <tr>\n                    <th>VOL</th>\n                    <th>PILOTO</th>\n                    <th>HORA</th>\n                    <th>TEMPO</th>\n                    <th>VM</th>\n                </tr>\n            </thead>\n\n            <tbody>\n\n                ' + voltas.map(function (n) {
                             return '\n                    <tr>\n                        <td>' + n.numero + '</td>\n                        <td>' + (n.piloto.codigo + ' - ' + n.piloto.nome) + '</td>\n                        <td>' + n.hora + '</td>\n                        <td>' + n.tempo + '</td>\n                        <td>' + n.velocidadeMedia + '</td>\n                    </tr>\n                    \n                ';
-                        }).join('') + '                \n            </tbody>\n\n            <tfoot>\n                <tr>\n                    <td colspan="5">MELHOR VOLTA CORRIDA: ' + max.piloto.nome + ' &nbsp;&nbsp;&nbsp; TMV = ' + max.tempo + '</td>\n                </tr>\n\n                <tr>\n                    <td colspan="5">LEGENDA:<br>\n                        <table width="100%">\n                            <tr><td>VOL = N\xBA DA VOLTA</td><td>MV = N\xBA DA MELHOR VOLTA</td></tr>\n                            <tr><td>TMV = TEMPO DA MELHOR VOLTA</td><td>DL = DIFEREN\xC7A PARA O L\xCDDER</td></tr>\n                            <tr><td>VM (Km/h) = VELOCIDADE M\xC9DIA</td><td>TAV = TEMPO AP\xD3S O VENCEDOR</td></tr>\n                        </table>\n                    </td>\n                </tr>\n            </tfoot>\n\n        </table>\n        ';
+                        }).join('') + '\n\n                <tr>\n                    <td colspan="5" bgcolor="#5D7B9D">VENCEDOR: ' + vencedor.piloto.nome + ' &nbsp;&nbsp;&nbsp; CHEGADA = ' + vencedor.hora + '</td>\n                </tr>\n\n                <tr>\n                    <td colspan="5">MVC: ' + mvc.piloto.nome + ' &nbsp;&nbsp;&nbsp; TMV = ' + mvc.tempo + '</td>\n                </tr>\n\n                ' + tmvp.map(function (n) {
+                            return '\n                    <tr>\n                        <td colspan="5">TMVP: ' + n.piloto.nome + ' &nbsp;&nbsp;&nbsp; TMV = ' + n.tempo + '</td>\n                    </tr>\n                    \n                ';
+                        }).join('') + '\n\n                ' + dl.map(function (n) {
+                            return '\n                    <tr>\n                        <td colspan="5">DL: ' + n.nome + ' &nbsp;&nbsp;&nbsp; DIFEREN\xC7A = ' + n.hora + '</td>\n                    </tr>\n                    \n                ';
+                        }).join('') + '\n            </tbody>\n\n            <tfoot>\n                <tr>\n                    <td colspan="5">LEGENDA:<br>\n                        <table width="100%">\n                            <tr><td>VOL = N\xBA DA VOLTA</td><td>MVC = MELHOR VOLTA DA CORRIDA</td></tr>\n                            <tr><td>TMVP = TEMPO DA MELHOR VOLTA PILOTO</td><td>DL = DIFEREN\xC7A PARA O L\xCDDER</td></tr>\n                            <tr><td>VM (Km/h) = VELOCIDADE M\xC9DIA</td><td>TAV = TEMPO AP\xD3S O VENCEDOR</td></tr>\n                        </table>\n                    </td>\n                </tr>\n            </tfoot>\n\n        </table>\n        ';
                     }
                 }]);
 
